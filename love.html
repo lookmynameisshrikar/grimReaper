@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stick Hit Animation</title>
+<style>
+  body {
+    margin: 0;
+    background: #111;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Ball properties
+let ball = {
+  x: 0,
+  y: canvas.height / 2,
+  radius: 15,
+  speed: 5
+};
+
+// Stick figure position
+let man = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  hit: false,
+  fallAngle: 0
+};
+
+function drawStickMan() {
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 3;
+
+  ctx.save();
+  ctx.translate(man.x, man.y);
+
+  if (man.hit) {
+    ctx.rotate(man.fallAngle);
+  }
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(0, -40, 10, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Body
+  ctx.beginPath();
+  ctx.moveTo(0, -30);
+  ctx.lineTo(0, 20);
+  ctx.stroke();
+
+  // Arms
+  ctx.beginPath();
+  ctx.moveTo(0, -10);
+  ctx.lineTo(-20, 10);
+  ctx.moveTo(0, -10);
+  ctx.lineTo(20, 10);
+  ctx.stroke();
+
+  // Legs
+  ctx.beginPath();
+  ctx.moveTo(0, 20);
+  ctx.lineTo(-15, 50);
+  ctx.moveTo(0, 20);
+  ctx.lineTo(15, 50);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawBall() {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Move ball
+  if (!man.hit) {
+    ball.x += ball.speed;
+  }
+
+  // Collision detection
+  if (
+    ball.x + ball.radius > man.x - 10 &&
+    ball.x - ball.radius < man.x + 10
+  ) {
+    man.hit = true;
+  }
+
+  // Animate fall
+  if (man.hit && man.fallAngle < Math.PI / 2) {
+    man.fallAngle += 0.05;
+  }
+
+  drawBall();
+  drawStickMan();
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
